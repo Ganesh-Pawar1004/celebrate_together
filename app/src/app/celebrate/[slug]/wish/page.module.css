@@ -1,0 +1,109 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-primary, var(--bg-app));
+  padding: var(--space-4);
+}
+
+.formCard {
+  background: var(--bg-surface, var(--bg-card));
+  border: 1px solid rgba(255 255 255 / 0.1);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-6);
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  box-shadow: 0 10px 40px rgba(0 0 0 / 0.4), inset 0 1px 0 rgba(255 255 255 / 0.05);
+  animation: cardReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.eventEmoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 20px var(--accent-glow));
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: var(--text-2xl);
+  color: var(--text-primary, var(--text-base));
+  line-height: 1.2;
+}
+
+.desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary, var(--text-muted));
+  margin: 0;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--text-secondary, var(--text-muted));
+  opacity: 0.8;
+  margin: 0;
+}
+
+/* Loading & Center States */
+.stateCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.loadingIcon {
+  font-size: 3.5rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.1); }
+}
+
+.loadingText {
+  color: var(--text-secondary, var(--text-muted));
+  font-size: var(--text-sm);
+}
+
+.errorIcon { font-size: 3.5rem; }
+.errorTitle {
+  font-size: var(--text-xl);
+  color: var(--text-primary, var(--text-base));
+}
+.errorDesc {
+  color: var(--text-secondary, var(--text-muted));
+  max-width: 32ch;
+  margin-bottom: var(--space-4);
+}

@@ -1,0 +1,235 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  padding-top: var(--space-4);
+}
+
+.cakeContainer {
+  position: relative;
+  width: 256px;
+  height: 190px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: var(--space-6);
+}
+
+.decorationsContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: var(--space-4);
+  z-index: 20;
+}
+
+.cakeBody {
+  position: relative;
+  width: 256px;
+  height: 120px;
+}
+
+.cakeSurface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  border-radius: 50%;
+  border: 4px solid rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 10px rgba(255, 255, 255, 0.2);
+}
+
+.recipientName {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: #333333;
+  transform: rotate(-4deg);
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
+  user-select: none;
+}
+
+.cakeSide {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: 100%;
+  height: 90px;
+  border-radius: 0 0 50% 50% / 0 0 50px 50px;
+  border-left: 4px solid rgba(0, 0, 0, 0.05);
+  border-right: 4px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 4px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.frostingDrips {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  border-radius: 0 0 50% 50% / 0 0 10px 10px;
+}
+
+/* Flavor Color Rules */
+
+/* Chocolate */
+.flavorChocolateBase {
+  background-color: #5d4037;
+}
+.flavorChocolateTop {
+  background-color: #795548;
+}
+.flavorChocolateFrosting {
+  background: repeating-linear-gradient(90deg, #3e2723, #3e2723 20px, #2a1b18 20px, #2a1b18 40px);
+}
+
+/* Strawberry */
+.flavorStrawberryBase {
+  background-color: #fbb6ce;
+}
+.flavorStrawberryTop {
+  background-color: #f687b3;
+}
+.flavorStrawberryFrosting {
+  background: repeating-linear-gradient(90deg, #ed64a6, #ed64a6 20px, #d53f8c 20px, #d53f8c 40px);
+}
+
+/* Red Velvet */
+.flavorRedVelvetBase {
+  background-color: #9b2c2c;
+}
+.flavorRedVelvetTop {
+  background-color: #c53030;
+}
+.flavorRedVelvetFrosting {
+  background: repeating-linear-gradient(90deg, #ffffff, #ffffff 20px, #f7fafc 20px, #f7fafc 40px);
+}
+
+/* Vanilla */
+.flavorVanillaBase {
+  background-color: #fefcbf;
+}
+.flavorVanillaTop {
+  background-color: #fef3c7;
+}
+.flavorVanillaFrosting {
+  background: repeating-linear-gradient(90deg, #ffffff, #ffffff 20px, #f7fafc 20px, #f7fafc 40px);
+}
+
+/* Dynamic Event Badge for Cake */
+.cakeBadge {
+  font-size: var(--text-base-size);
+  font-weight: 700;
+  color: var(--accent);
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(0) scale(1);
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease;
+  user-select: none;
+}
+
+.cakeBadgePopped {
+  transform: translateY(-8px) scale(1.1);
+  box-shadow: var(--shadow-lg), 0 0 15px var(--accent-glow);
+}
+
+/* Click Target Overlay */
+.clickTarget {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  cursor: pointer;
+  border-radius: 50% 50% 25% 25%;
+}
+
+/* Controls */
+.controls {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-8);
+  z-index: 20;
+}
+
+.actionBtn {
+  animation: pulseButton 2s infinite ease-in-out;
+}
+
+@keyframes pulseButton {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-accent);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 8px 30px var(--accent-glow);
+  }
+}
+
+.instructionsBox {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--surface-border);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  width: 100%;
+}
+
+.instructionText {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.progressContainer {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.progressLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.progressBarBg {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover, var(--accent)));
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}

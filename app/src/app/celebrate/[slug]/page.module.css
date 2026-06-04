@@ -1,0 +1,414 @@
+/* The page uses CSS custom properties set by theme tokens */
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-primary, var(--bg-app));
+}
+
+/* ─── Background particles ─── */
+.bgParticles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bgParticle {
+  position: absolute;
+  bottom: -5%;
+  animation: floatUp linear infinite;
+  user-select: none;
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(0) rotate(0deg);   opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.5; }
+  100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ─── Shared center layout ─── */
+.stateCenter {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  max-width: 520px;
+}
+
+/* ─── Loading ─── */
+.loadingIcon {
+  font-size: 4rem;
+  animation: pulseIcon 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.12); }
+}
+
+.loadingText {
+  font-size: var(--text-lg);
+  color: var(--text-secondary, var(--text-muted));
+  margin: 0;
+}
+
+/* ─── Error ─── */
+.errorIcon { font-size: 4rem; }
+.errorTitle {
+  font-size: var(--text-3xl);
+  color: var(--text-primary, var(--text-base));
+}
+.errorDesc {
+  color: var(--text-secondary, var(--text-muted));
+  max-width: 36ch;
+}
+
+/* ─── Waiting (countdown) ─── */
+.waitingSection {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  width: 100%;
+  max-width: 600px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.giftPulse {
+  font-size: 5rem;
+  animation: giftFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px var(--particle-color, var(--accent)));
+}
+
+@keyframes giftFloat {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%       { transform: translateY(-12px) rotate(3deg); }
+}
+
+.surpriseHint {
+  font-size: var(--text-base-size);
+  color: var(--text-secondary, var(--text-muted));
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.forName {
+  font-size: clamp(2rem, 6vw, var(--text-5xl));
+  color: var(--text-primary, var(--text-base));
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.nameHighlight {
+  color: var(--accent-primary, var(--accent));
+  text-shadow: 0 0 30px var(--particle-color, var(--accent-glow));
+}
+
+.fromName {
+  font-size: var(--text-sm);
+  color: var(--text-secondary, var(--text-muted));
+  font-weight: 500;
+  margin: 0;
+}
+
+.countdownWrapper {
+  width: 100%;
+  margin: var(--space-4) 0;
+  padding: var(--space-6) var(--space-8);
+  background: rgba(255 255 255 / 0.04);
+  border: 1px solid rgba(255 255 255 / 0.08);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(10px);
+}
+
+.waitHint {
+  font-size: var(--text-sm);
+  color: var(--text-secondary, var(--text-muted));
+  margin: 0;
+  opacity: 0.7;
+}
+
+/* ─── Revealed ─── */
+.revealSection {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+  width: 100%;
+  max-width: 640px;
+  animation: revealIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes revealIn {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.revealHeader {
+  animation: emojiPop 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+@keyframes emojiPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.revealEmoji {
+  font-size: 6rem;
+  display: block;
+  filter: drop-shadow(0 0 30px var(--particle-color, var(--accent)));
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.revealCard {
+  background: var(--bg-surface, var(--bg-card));
+  border: 1px solid rgba(255 255 255 / 0.1);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-8);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  box-shadow: 0 0 60px rgba(0 0 0 / 0.4), inset 0 1px 0 rgba(255 255 255 / 0.05);
+  animation: cardReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.revealHappy {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent-primary, var(--accent));
+  margin: 0;
+}
+
+.revealName {
+  font-size: clamp(2rem, 5vw, var(--text-5xl));
+  color: var(--text-primary, var(--text-base));
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  animation: nameReveal 0.5s ease 0.4s both;
+}
+
+@keyframes nameReveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.revealDivider {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-primary, var(--accent)),
+    var(--accent-secondary, var(--gold)),
+    transparent
+  );
+  border-radius: 2px;
+}
+
+.revealMessage {
+  margin: 0;
+  padding: 0;
+  animation: msgReveal 0.6s ease 0.6s both;
+}
+
+@keyframes msgReveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.revealMessage p {
+  font-size: clamp(1rem, 2.5vw, var(--text-lg));
+  line-height: 1.85;
+  color: var(--text-primary, var(--text-base));
+  font-style: italic;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0 0 var(--space-4) 0;
+}
+
+.revealFrom {
+  font-size: var(--text-sm);
+  color: var(--accent-primary, var(--accent));
+  font-weight: 600;
+  font-style: normal;
+  text-align: right;
+}
+
+.revealPhotoWrapper {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255 255 255 / 0.1);
+  animation: cardReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+  box-shadow: 0 4px 24px rgba(0 0 0 / 0.35);
+}
+
+.revealPhoto {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── Reactions ─── */
+.reactionSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  animation: fadeIn 0.4s ease 0.8s both;
+}
+
+.reactionPrompt {
+  font-size: var(--text-base-size);
+  color: var(--text-secondary, var(--text-muted));
+  font-weight: 500;
+  margin: 0;
+}
+
+.emojiGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.emojiBtn {
+  font-size: 2rem;
+  line-height: 1;
+  padding: var(--space-3);
+  background: rgba(255 255 255 / 0.05);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--transition-fast),
+              background-color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.emojiBtn:hover {
+  transform: scale(1.25) rotate(-5deg);
+  background: rgba(255 255 255 / 0.1);
+}
+
+.emojiBtn:focus-visible {
+  outline: 2px solid var(--accent-primary, var(--accent));
+  outline-offset: 2px;
+}
+
+.emojiBtn.emojiSelected {
+  border-color: var(--accent-primary, var(--accent));
+  background: rgba(255 255 255 / 0.12);
+  transform: scale(1.2);
+  animation: emojiPop 0.3s ease;
+}
+
+.reactionSent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-base-size);
+  color: var(--text-secondary, var(--text-muted));
+  padding: var(--space-4) var(--space-6);
+  background: rgba(255 255 255 / 0.04);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255 255 255 / 0.08);
+  animation: fadeIn 0.3s ease;
+}
+
+.reactionSent span {
+  font-size: 1.75rem;
+}
+
+.reactionSent p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text-secondary, var(--text-muted));
+}
+
+/* ─── Live Celebration Trigger ─── */
+.liveCelebrateSection {
+  margin: var(--space-5) 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  animation: fadeIn 0.4s ease 0.7s both;
+}
+
+.liveCelebrateBtn {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  padding: var(--space-4) var(--space-10);
+  background: linear-gradient(135deg, var(--accent-primary, var(--accent)), var(--accent-secondary, var(--gold)));
+  border-radius: var(--radius-xl);
+  box-shadow: 0 10px 30px var(--accent-glow);
+  color: #ffffff;
+  animation: pulseCelebrate 2.5s infinite ease-in-out;
+  border: none;
+}
+
+.liveCelebrateBtn:hover {
+  background: linear-gradient(135deg, var(--accent-hover, var(--accent)), var(--accent-secondary, var(--gold)));
+  transform: scale(1.04) translateY(-2px);
+  box-shadow: 0 12px 35px var(--accent-glow);
+}
+
+@keyframes pulseCelebrate {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6px 20px var(--accent-glow);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px var(--accent-glow);
+  }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .revealCard {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .countdownWrapper {
+    padding: var(--space-4);
+  }
+}

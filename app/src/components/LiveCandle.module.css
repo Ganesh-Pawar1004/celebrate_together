@@ -1,0 +1,58 @@
+.candleWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flame {
+  width: 14px;
+  height: 28px;
+  background: linear-gradient(to top, #ff6b35, #ffd166, #ffffff);
+  border-radius: 50% 50% 20% 20%;
+  filter: blur(0.5px);
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.8), 0 0 24px rgba(255, 209, 102, 0.4);
+  transform-origin: bottom center;
+  margin-bottom: 4px;
+}
+
+.candleBody {
+  width: 16px;
+  height: 56px;
+  background: linear-gradient(to right, #ffe3e3, #ffd1d1);
+  border-radius: 2px;
+  border: 1px solid #ffb3b3;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.wick {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 6px;
+  background-color: #333333;
+}
+
+.stripe {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  background-color: rgba(232, 83, 74, 0.25);
+  transform: skewY(-10deg);
+}
+
+.stripe1 {
+  top: 10px;
+}
+
+.stripe2 {
+  top: 24px;
+}
+
+.stripe3 {
+  top: 38px;
+}

@@ -1,0 +1,112 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ─── Drop zone ─── */
+.dropzone {
+  width: 100%;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background: rgba(255 255 255 / 0.04);
+  border: 2px dashed rgba(255 255 255 / 0.15);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  padding: var(--space-6);
+  text-align: center;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+
+.dropzone:hover,
+.dropzone.dragging {
+  background: rgba(232, 83, 74, 0.07);
+  border-color: var(--accent);
+  transform: scale(1.01);
+}
+
+.dropzone:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.dropIcon {
+  font-size: 2.25rem;
+  line-height: 1;
+  transition: transform var(--transition-base);
+}
+
+.dropzone:hover .dropIcon,
+.dropzone.dragging .dropIcon {
+  transform: scale(1.2) rotate(-5deg);
+}
+
+.dropMain {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-base);
+}
+
+.dropSub {
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+}
+
+/* ─── Preview ─── */
+.preview {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+}
+
+.previewImg {
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  display: block;
+}
+
+.previewOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0 0 0 / 0);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  opacity: 0;
+  transition: background-color var(--transition-base), opacity var(--transition-base);
+}
+
+.preview:hover .previewOverlay {
+  background: rgba(0 0 0 / 0.45);
+  opacity: 1;
+}
+
+.changeBtn,
+.removeBtn {
+  backdrop-filter: blur(8px);
+  background: rgba(0 0 0 / 0.5) !important;
+  border-color: rgba(255 255 255 / 0.2) !important;
+  color: #fff !important;
+}
+
+/* ─── Error ─── */
+.errorMsg {
+  color: #ff6b6b;
+  font-size: var(--text-xs);
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  margin: 0;
+}
