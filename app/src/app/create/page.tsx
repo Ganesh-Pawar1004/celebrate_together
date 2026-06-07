@@ -136,14 +136,14 @@ function CreatePageInner() {
         const res = await fetch(`https://archive.org/metadata/${item.identifier}`);
         if (!res.ok) throw new Error('Failed to fetch track details.');
         const data = await res.json();
-        
-        const mp3File = data.files?.find((f: any) => 
-          f.name.toLowerCase().endsWith('.mp3') || 
+
+        const mp3File = data.files?.find((f: any) =>
+          f.name.toLowerCase().endsWith('.mp3') ||
           f.format?.toLowerCase().includes('mp3')
         );
-        
+
         if (!mp3File) throw new Error('No streamable MP3 track found for this item.');
-        
+
         fileUrl = `https://archive.org/download/${item.identifier}/${encodeURIComponent(mp3File.name)}`;
         item.fileUrl = fileUrl;
       }
@@ -170,21 +170,21 @@ function CreatePageInner() {
         const res = await fetch(`https://archive.org/metadata/${item.identifier}`);
         if (!res.ok) throw new Error('Failed to fetch track details.');
         const data = await res.json();
-        
-        const mp3File = data.files?.find((f: any) => 
-          f.name.toLowerCase().endsWith('.mp3') || 
+
+        const mp3File = data.files?.find((f: any) =>
+          f.name.toLowerCase().endsWith('.mp3') ||
           f.format?.toLowerCase().includes('mp3')
         );
-        
+
         if (!mp3File) throw new Error('No streamable MP3 track found for this item.');
-        
+
         fileUrl = `https://archive.org/download/${item.identifier}/${encodeURIComponent(mp3File.name)}`;
         item.fileUrl = fileUrl;
       }
 
       setSelectedSearchTrack(item);
       update('custom_music_data', fileUrl);
-      
+
       if (previewAudioRef.current) {
         previewAudioRef.current.pause();
         setPreviewingTrack(null);
@@ -381,9 +381,8 @@ function CreatePageInner() {
             {STEPS.slice(0, 4).map((label, i) => (
               <div key={label} className="step-item">
                 <div
-                  className={`step-circle ${
-                    i < step ? 'step-circle--done' : i === step ? 'step-circle--active' : 'step-circle--pending'
-                  }`}
+                  className={`step-circle ${i < step ? 'step-circle--done' : i === step ? 'step-circle--active' : 'step-circle--pending'
+                    }`}
                   aria-current={i === step ? 'step' : undefined}
                 >
                   {i < step ? '✓' : i + 1}
@@ -434,7 +433,7 @@ function CreatePageInner() {
                     id="recipient-name"
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Priya"
+                    placeholder="e.g. Ganesh"
                     value={form.recipient_name}
                     onChange={(e) => update('recipient_name', e.target.value)}
                     maxLength={60}
@@ -452,7 +451,7 @@ function CreatePageInner() {
                     id="sender-name"
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Rahul"
+                    placeholder="e.g. Durgaa"
                     value={form.sender_name}
                     onChange={(e) => update('sender_name', e.target.value)}
                     maxLength={60}
@@ -488,7 +487,7 @@ function CreatePageInner() {
                 <span className="form-hint" style={{ marginTop: 0 }}>
                   These will float in a Polaroid slideshow during the celebration.
                 </span>
-                
+
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.5rem' }}>
                   {photos.map((img, idx) => (
                     <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
@@ -518,7 +517,7 @@ function CreatePageInner() {
                       </button>
                     </div>
                   ))}
-                  
+
                   {photos.length < 4 && (
                     <label style={{
                       width: '80px',
@@ -679,8 +678,8 @@ function CreatePageInner() {
                   {uploadingMusic
                     ? 'Processing & compressing audio (mono WAV)...'
                     : form.custom_music_data
-                    ? 'Music uploaded! Click to change.'
-                    : 'Choose an audio file (MP3, M4A, OGG · auto-trimmed to 1.5 min)'}
+                      ? 'Music uploaded! Click to change.'
+                      : 'Choose an audio file (MP3, M4A, OGG · auto-trimmed to 1.5 min)'}
                   <input
                     id="custom-music-input"
                     type="file"
@@ -690,28 +689,28 @@ function CreatePageInner() {
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      
+
                       setUploadingMusic(true);
                       try {
                         // Compress & Trim to 90 seconds Mono WAV
                         const compressedBlob = await compressAudioFile(file);
                         const compressedFile = new File([compressedBlob], 'music.wav', { type: 'audio/wav' });
-                        
+
                         if (isSupabaseConfigured) {
                           const fileExt = 'wav';
                           const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
                           const { data, error: uploadErr } = await supabase.storage
                             .from('celebration-music')
                             .upload(fileName, compressedFile);
-                            
+
                           if (uploadErr) {
                             throw new Error('Upload failed: ' + uploadErr.message);
                           }
-                          
+
                           const { data: { publicUrl } } = supabase.storage
                             .from('celebration-music')
                             .getPublicUrl(fileName);
-                            
+
                           update('custom_music_data', publicUrl);
                         } else {
                           // Demo fallback: convert compressed file to base64
@@ -850,7 +849,7 @@ function CreatePageInner() {
                               {item.creator || 'Unknown Creator'}
                             </p>
                           </div>
-                          
+
                           {/* Play/Pause Preview Button */}
                           <button
                             type="button"
@@ -1004,7 +1003,7 @@ function CreatePageInner() {
               <p className={styles.stepDesc} style={{ marginBottom: '1.25rem' }}>
                 Send this wish-collection link to friends. They can leave wishes that float up in real-time during the live celebration!
               </p>
-              
+
               <div className={styles.linkBox}>
                 <span className={styles.linkText}>{wishUrl}</span>
                 <button
@@ -1020,9 +1019,9 @@ function CreatePageInner() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginTop: '1.25rem', padding: '1.25rem', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: 'var(--radius-md)' }}>
                 <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0, textAlign: 'center', fontWeight: 500 }}>📲 Or have friends scan this QR Code to submit wishes:</p>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(wishUrl)}`} 
-                  alt="Wish submission QR Code" 
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(wishUrl)}`}
+                  alt="Wish submission QR Code"
                   style={{ width: '130px', height: '130px', borderRadius: 'var(--radius-sm)', border: '4px solid white', boxShadow: 'var(--shadow-md)' }}
                 />
               </div>
@@ -1079,23 +1078,23 @@ async function compressAudioFile(file: File): Promise<Blob> {
   const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
   const arrayBuffer = await file.arrayBuffer();
   const decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-  
+
   // Cap at 90 seconds (1m 30s)
   const maxDuration = Math.min(decodedBuffer.duration, 90);
   const sampleRate = 22050; // downsample to 22.05kHz
   const numChannels = 1; // mono
   const length = maxDuration * sampleRate;
-  
+
   const offlineCtx = new OfflineAudioContext(numChannels, length, sampleRate);
-  
+
   const sourceNode = offlineCtx.createBufferSource();
   sourceNode.buffer = decodedBuffer;
   sourceNode.connect(offlineCtx.destination);
   sourceNode.start(0);
-  
+
   const renderedBuffer = await offlineCtx.startRendering();
   audioCtx.close();
-  
+
   return bufferToWav(renderedBuffer);
 }
 
@@ -1108,7 +1107,7 @@ function bufferToWav(buffer: AudioBuffer): Blob {
   const bufferLength = result.length * 2;
   const wavBuffer = new ArrayBuffer(44 + bufferLength);
   const view = new DataView(wavBuffer);
-  
+
   const writeString = (view: DataView, offset: number, string: string) => {
     for (let i = 0; i < string.length; i++) {
       view.setUint8(offset + i, string.charCodeAt(i));
@@ -1148,9 +1147,9 @@ function bufferToWav(buffer: AudioBuffer): Blob {
   writeString(view, 36, 'data');
   /* data chunk length */
   view.setUint32(40, bufferLength, true);
-  
+
   // Write PCM audio samples
   floatTo16BitPCM(view, 44, result);
-  
+
   return new Blob([view], { type: 'audio/wav' });
 }

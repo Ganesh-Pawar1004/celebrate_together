@@ -45,6 +45,8 @@ create table if not exists public.events (
   timezone text not null default 'UTC',
   theme text not null default 'joyful',
   music_preset text default 'none',
+  custom_music_data text,
+  cake_flavor text default 'chocolate',
   photo_url text,
   share_slug text unique not null,
   is_active boolean not null default true,
