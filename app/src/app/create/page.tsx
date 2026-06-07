@@ -330,14 +330,25 @@ function CreatePageInner() {
       return;
     }
 
-    const { error: dbErr } = await supabase.from('events').insert(eventPayload);
+    // For Supabase, omit the 'id' field so that the database automatically
+    // generates a valid UUID for the primary key.
+    const { id: _, ...supabaseBasePayload } = basePayload;
+    const { id: __, ...supabaseEventPayload } = eventPayload;
+
+    const { error: dbErr } = await supabase.from('events').insert(supabaseEventPayload);
     if (dbErr) {
-      console.warn('Insert with extra columns failed, falling back to base insert:', dbErr);
-      const { error: retryErr } = await supabase.from('events').insert(basePayload);
+      console.warn('Insert with extra columns failed (cake_flavor/uuid), falling back to base insert:', dbErr);
+      const { error: retryErr } = await supabase.from('events').insert(supabaseBasePayload);
       if (retryErr) {
-        setError('Could not save your celebration. Please try again.');
-        setLoading(false);
-        return;
+        console.warn('Base insert failed (custom_music_data), falling back to minimal insert:', retryErr);
+        // Exclude both cake_flavor and custom_music_data for a graceful minimal fallback
+        const { cake_flavor, custom_music_data, ...minimalPayload } = supabaseEventPayload;
+        const { error: minimalErr } = await supabase.from('events').insert(minimalPayload);
+        if (minimalErr) {
+          setError('Could not save your celebration. Please check your database schema and try again.');
+          setLoading(false);
+          return;
+        }
       }
     }
 
