@@ -2,17 +2,55 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    if (isSupabaseConfigured) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null);
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        setUser(session?.user ?? null);
+        
+        if (event === 'SIGNED_IN' && session) {
+          if (window.location.pathname === '/' || window.location.pathname === '/login') {
+            window.location.href = '/dashboard';
+          }
+        }
+      });
+
+      return () => {
+        window.removeEventListener('scroll', onScroll);
+        subscription.unsubscribe();
+      };
+    }
+
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const handleSignOut = async () => {
+    if (isSupabaseConfigured) {
+      await supabase.auth.signOut();
+      setUser(null);
+      window.location.href = '/';
+    }
+  };
+
+  if (pathname?.startsWith('/celebrate/')) {
+    return null;
+  }
 
   return (
     <header className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`} role="banner">
@@ -34,7 +72,13 @@ export default function Navbar() {
 
         {/* CTA */}
         <div className={styles.actions}>
-          <Link href="/login" className="btn btn--ghost btn--sm">Sign In</Link>
+          {user ? (
+            <button onClick={handleSignOut} className="btn btn--ghost btn--sm">
+              Sign Out
+            </button>
+          ) : (
+            <Link href="/login" className="btn btn--ghost btn--sm">Sign In</Link>
+          )}
           <Link href="/create" className="btn btn--primary btn--sm">
             Create Celebration ✨
           </Link>
@@ -60,7 +104,31 @@ export default function Navbar() {
             <li><Link href="/#how-it-works" onClick={() => setMenuOpen(false)}>How It Works</Link></li>
             <li><Link href="/#occasions" onClick={() => setMenuOpen(false)}>Occasions</Link></li>
             <li><Link href="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link></li>
-            <li><Link href="/login" onClick={() => setMenuOpen(false)}>Sign In</Link></li>
+            {user ? (
+              <li>
+                <button
+                  onClick={() => { handleSignOut(); setMenuOpen(false); }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    width: '100%',
+                    fontSize: 'var(--text-base-size)',
+                    fontFamily: 'inherit',
+                    fontWeight: 500,
+                    color: 'var(--text-muted)',
+                    display: 'block',
+                    padding: 'var(--space-2) 0',
+                    borderBottom: '1px solid var(--surface-border)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Sign Out
+                </button>
+              </li>
+            ) : (
+              <li><Link href="/login" onClick={() => setMenuOpen(false)}>Sign In</Link></li>
+            )}
             <li>
               <Link href="/create" className="btn btn--primary" onClick={() => setMenuOpen(false)}>
                 Create Celebration ✨

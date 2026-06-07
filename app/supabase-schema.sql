@@ -69,11 +69,16 @@ create policy "Auth users can update own events"
   on public.events for update
   using (auth.uid() = creator_id);
 
--- Allow anonymous view count increments
-create policy "Allow view count update"
-  on public.events for update
-  using (true)
-  with check (true);
+-- Security Definer function to increment event view count safely (avoids permissive update RLS)
+create or replace function public.increment_view_count(event_id uuid)
+returns void as $$
+begin
+  update public.events
+  set view_count = coalesce(view_count, 0) + 1
+  where id = event_id;
+end;
+$$ language plpgsql security definer;
+
 
 -- Reactions
 create table if not exists public.reactions (
@@ -115,8 +120,8 @@ alter table public.events
 create table if not exists public.wishes (
   id uuid primary key default gen_random_uuid(),
   event_id uuid references public.events(id) on delete cascade not null,
-  name text not null,
-  message text not null,
+  name text not null constraint chk_name_length check (char_length(name) <= 50),
+  message text not null constraint chk_message_length check (char_length(message) <= 500),
   created_at timestamptz default now()
 );
 
@@ -131,4 +136,83 @@ create policy "Anyone can insert wishes"
 create policy "Anyone can read wishes"
   on public.wishes for select
   using (true);
+
+-- =============================================================
+-- OPTIONAL: Server-Side Rate Limiting Trigger (For Production)
+-- Run this in Supabase if you want to block API spam on wishes.
+-- It tracks client IP from Supabase headers and blocks inserts > 10 per min.
+-- =============================================================
+/*
+-- 1. Create a table to track request counts by IP
+create table if not exists public.rate_limits (
+  ip_address text primary key,
+  request_count integer not null default 1,
+  last_request timestamptz default now()
+);
+
+-- 2. Create the rate limiter function
+create or replace function public.check_wish_rate_limit()
+returns trigger as $$
+declare
+  client_ip text;
+  req_record record;
+begin
+  -- Retrieve client IP from request headers injected by Supabase
+  client_ip := coalesce(
+    current_setting('request.headers', true)::json->>'x-forwarded-for',
+    'unknown_ip'
+  );
+
+  select * from public.rate_limits where ip_address = client_ip into req_record;
+
+  if not found then
+    insert into public.rate_limits (ip_address) values (client_ip);
+  else
+    if req_record.last_request > now() - interval '1 minute' then
+      if req_record.request_count >= 10 then
+        raise exception 'Too many requests. Please wait before submitting more wishes.';
+      else
+        update public.rate_limits
+        set request_count = request_count + 1
+        where ip_address = client_ip;
+      end if;
+    else
+      update public.rate_limits
+      set request_count = 1, last_request = now()
+      where ip_address = client_ip;
+    end if;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- 3. Bind function to wishes table
+create or replace trigger trigger_check_wish_rate_limit
+  before insert on public.wishes
+  for each row execute procedure public.check_wish_rate_limit();
+*/
+
+-- =============================================================
+-- STORAGE BUCKETS SETUP: celebration-music
+-- Run this in your SQL Editor to set up the storage bucket
+-- and configure public RLS access policies.
+-- =============================================================
+/*
+-- 1. Insert celebration-music bucket definition
+insert into storage.buckets (id, name, public) 
+values ('celebration-music', 'celebration-music', true)
+on conflict (id) do nothing;
+
+-- 2. Allow public access to read/download audio files
+create policy "Public Access" 
+  on storage.objects for select 
+  using (bucket_id = 'celebration-music');
+
+-- 3. Allow anonymous/public uploads (creators uploading custom music)
+create policy "Allow Anonymous Uploads" 
+  on storage.objects for insert 
+  with check (bucket_id = 'celebration-music');
+*/
+
 

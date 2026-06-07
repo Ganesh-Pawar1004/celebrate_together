@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { getEventBySlug } from '@/lib/localStore';
 import type { CelebrationEvent } from '@/lib/types';
@@ -108,7 +109,7 @@ export default function CelebratePage() {
 
       setEvent(data);
       startCountdown(data);
-      await supabase.from('events').update({ view_count: (data.view_count ?? 0) + 1 }).eq('id', data.id);
+      await supabase.rpc('increment_view_count', { event_id: data.id });
     }
 
     loadEvent();
@@ -172,11 +173,20 @@ export default function CelebratePage() {
         </div>
       )}
 
-      {/* ── LOADING ── */}
+      {/* ── LOADING SKELETON ── */}
       {pageState === 'loading' && (
-        <div className={styles.stateCenter}>
-          <div className={styles.loadingIcon} aria-label="Loading your surprise">🎁</div>
-          <p className={styles.loadingText}>Loading your surprise...</p>
+        <div className={styles.revealSection} style={{ opacity: 0.6, width: '100%', maxWidth: '500px', margin: '0 auto' }}>
+          <div className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '50%', marginBottom: '2rem', marginLeft: 'auto', marginRight: 'auto' }} />
+          <div className={styles.revealCard} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '2rem' }}>
+            <div className="skeleton" style={{ width: '40%', height: '1.25rem', alignSelf: 'center' }} />
+            <div className="skeleton" style={{ width: '70%', height: '2.5rem', alignSelf: 'center', margin: '0.5rem 0' }} />
+            <div className="skeleton" style={{ width: '100%', height: '160px', borderRadius: 'var(--radius-md)' }} />
+            <div className={styles.revealDivider} />
+            <div className="skeleton" style={{ width: '90%', height: '1rem' }} />
+            <div className="skeleton" style={{ width: '80%', height: '1rem' }} />
+            <div className="skeleton" style={{ width: '40%', height: '1rem', alignSelf: 'flex-end', marginTop: '0.5rem' }} />
+          </div>
+          <div className="skeleton" style={{ width: '260px', height: '48px', borderRadius: 'var(--radius-full)', marginTop: '2.5rem', marginLeft: 'auto', marginRight: 'auto' }} />
         </div>
       )}
 
@@ -188,7 +198,7 @@ export default function CelebratePage() {
           <p className={styles.errorDesc}>
             This link may have expired or the celebration was removed. Ask the person who sent it!
           </p>
-          <a href="/" className="btn btn--primary btn--lg">Go Home</a>
+          <Link href="/" className="btn btn--primary btn--lg">Go Home</Link>
         </div>
       )}
 
@@ -281,12 +291,12 @@ export default function CelebratePage() {
 
           {/* Real-time Live Interactive Celebration Button */}
           <div className={styles.liveCelebrateSection}>
-            <a 
+            <Link 
               href={`/celebrate/${slug}/live`} 
               className={`btn btn--primary btn--lg ${styles.liveCelebrateBtn}`}
             >
               🎉 Let&apos;s Celebrate the Moment! 🎂
-            </a>
+            </Link>
           </div>
 
           {/* Reaction section */}
@@ -315,9 +325,9 @@ export default function CelebratePage() {
             </div>
           )}
 
-          <a href="/create" className="btn btn--ghost btn--lg" style={{ marginTop: 'var(--space-6)' }}>
+          <Link href="/create" className="btn btn--ghost btn--lg" style={{ marginTop: 'var(--space-6)' }}>
             Create Your Own Celebration ✨
-          </a>
+          </Link>
         </div>
       )}
 

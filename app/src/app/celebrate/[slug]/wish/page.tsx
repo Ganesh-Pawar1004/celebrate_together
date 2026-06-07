@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { getEventBySlug } from '@/lib/localStore';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { addWish } from '@/lib/wishesStore';
@@ -51,11 +52,23 @@ export default function WishPage() {
     e.preventDefault();
     if (!event) return;
     
+    // Client-side rate limiting
+    const lastSubmitted = localStorage.getItem(`last_wish_submitted_${event.share_slug}`);
+    if (lastSubmitted) {
+      const diff = Date.now() - Number(lastSubmitted);
+      if (diff < 30000) {
+        const secondsLeft = Math.ceil((30000 - diff) / 1000);
+        setError(`Please wait ${secondsLeft} second${secondsLeft > 1 ? 's' : ''} before sending another wish.`);
+        return;
+      }
+    }
+    
     setSubmitting(true);
     setError('');
 
     try {
       await addWish(event.id, name.trim(), message.trim());
+      localStorage.setItem(`last_wish_submitted_${event.share_slug}`, Date.now().toString());
       setSubmitted(true);
     } catch (err) {
       console.error(err);
@@ -68,9 +81,23 @@ export default function WishPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.stateCenter}>
-          <div className={styles.loadingIcon}>🎁</div>
-          <p className={styles.loadingText}>Loading...</p>
+        <div className={styles.formCard} style={{ opacity: 0.6, display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', maxWidth: '440px', padding: '2rem' }}>
+          <div className={styles.header} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+            <div className="skeleton" style={{ width: '70px', height: '70px', borderRadius: '50%' }} />
+            <div className="skeleton" style={{ width: '55%', height: '1.5rem', marginTop: '0.5rem' }} />
+            <div className="skeleton" style={{ width: '85%', height: '1rem' }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div className="skeleton" style={{ width: '30%', height: '0.875rem' }} />
+              <div className="skeleton" style={{ width: '100%', height: '42px', borderRadius: 'var(--radius-md)' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div className="skeleton" style={{ width: '35%', height: '0.875rem' }} />
+              <div className="skeleton" style={{ width: '100%', height: '110px', borderRadius: 'var(--radius-md)' }} />
+            </div>
+            <div className="skeleton" style={{ width: '100%', height: '48px', borderRadius: 'var(--radius-md)', marginTop: '0.5rem' }} />
+          </div>
         </div>
       </div>
     );
@@ -83,7 +110,7 @@ export default function WishPage() {
           <span className={styles.errorIcon}>💔</span>
           <h1 className={styles.errorTitle}>Surprise not found</h1>
           <p className={styles.errorDesc}>This link may have expired or is incorrect.</p>
-          <a href="/" className="btn btn--primary">Go Home</a>
+          <Link href="/" className="btn btn--primary">Go Home</Link>
         </div>
       </div>
     );
@@ -137,6 +164,7 @@ export default function WishPage() {
               maxLength={50}
               disabled={submitting}
             />
+            <div className={styles.charCounter}>{name.length} / 50 characters</div>
           </div>
 
           <div className="form-group">
@@ -152,6 +180,7 @@ export default function WishPage() {
               rows={4}
               disabled={submitting}
             />
+            <div className={styles.charCounter}>{message.length} / 500 characters</div>
           </div>
 
           {error && <p className="form-error" role="alert">{error}</p>}

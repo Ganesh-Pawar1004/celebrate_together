@@ -14,7 +14,7 @@ import { LiveFloatingWishes } from '@/components/LiveFloatingWishes';
 import { LiveWishesWall } from '@/components/LiveWishesWall';
 import type { CelebrationEvent } from '@/lib/types';
 import { THEME_TOKENS } from '@/lib/utils';
-import { Home, Share2, Clipboard, ArrowRight } from 'lucide-react';
+import { Home, Share2, Clipboard, ArrowRight, QrCode } from 'lucide-react';
 import styles from './page.module.css';
 
 type Step = 'intro' | 'cake' | 'party';
@@ -28,6 +28,7 @@ export default function LiveCelebrationPage() {
   const [loading, setLoading] = useState(true);
   const [copiedWish, setCopiedWish] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const [floatingEmojis, setFloatingEmojis] = useState<{ id: number; emoji: string; x: number; delay: number; duration: number }[]>([]);
 
   // Load Event
@@ -150,9 +151,24 @@ export default function LiveCelebrationPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.stateCenter}>
-          <div className={styles.loadingIcon}>🎁</div>
-          <p className={styles.loadingText}>Preparing live stage...</p>
+        <div className={styles.stepContainer} style={{ opacity: 0.6, width: '100%', maxWidth: '600px', margin: '100px auto 0 auto' }}>
+          <div className={styles.introHeader} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <div className="skeleton" style={{ width: '35%', height: '1.25rem' }} />
+            <div className="skeleton" style={{ width: '80%', height: '4rem', margin: '0.5rem 0' }} />
+            <div className="skeleton" style={{ width: '60%', height: '1rem' }} />
+          </div>
+          
+          <div className="skeleton" style={{ width: '280px', height: '54px', borderRadius: 'var(--radius-xl)', marginTop: '1rem' }} />
+          
+          <div className={styles.wishCollectorCard} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', padding: '2rem' }}>
+            <div className="skeleton" style={{ width: '45%', height: '1.25rem' }} />
+            <div className="skeleton" style={{ width: '95%', height: '1rem' }} />
+            <div className="skeleton" style={{ width: '85%', height: '1rem' }} />
+            <div style={{ display: 'flex', gap: '1rem', width: '100%', marginTop: '0.5rem' }}>
+              <div className="skeleton" style={{ flex: 1, height: '42px', borderRadius: 'var(--radius-md)' }} />
+              <div className="skeleton" style={{ width: '90px', height: '42px', borderRadius: 'var(--radius-md)' }} />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -342,6 +358,16 @@ export default function LiveCelebrationPage() {
                     {copiedWish ? 'Copied!' : 'Copy'}
                   </button>
                 </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', padding: '1rem', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: 'var(--radius-md)' }}>
+                  <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0, textAlign: 'center', fontWeight: 500 }}>📲 Scan to post wishes in real-time:</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(wishUrl)}`} 
+                    alt="Wish QR Code" 
+                    style={{ width: '120px', height: '120px', borderRadius: 'var(--radius-sm)', border: '4px solid white', boxShadow: 'var(--shadow-md)' }}
+                  />
+                </div>
               </div>
             </motion.div>
           )}
@@ -410,6 +436,14 @@ export default function LiveCelebrationPage() {
                   <Clipboard size={16} style={{ marginRight: 8 }} />
                   {copiedWish ? 'Link Copied!' : 'Get Wish Link'}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setShowQrModal(true)}
+                  className={`btn btn--ghost ${styles.bottomActionBtn}`}
+                >
+                  <QrCode size={16} style={{ marginRight: 8 }} />
+                  Wishes QR
+                </button>
               </div>
             </motion.div>
           )}
@@ -418,7 +452,49 @@ export default function LiveCelebrationPage() {
 
       {/* Floating Music player controls */}
       {resolvedMusicUrl && (
-        <MusicPlayer trackUrl={resolvedMusicUrl} loop />
+        <MusicPlayer 
+          trackUrl={resolvedMusicUrl} 
+          loop 
+          forcePlay={step !== 'intro'}
+        />
+      )}
+
+      {/* QR Code Modal Overlay */}
+      {showQrModal && (
+        <div 
+          className={styles.modalOverlay} 
+          onClick={() => setShowQrModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Wishes QR Code Modal"
+        >
+          <div 
+            className={styles.modalCard}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              type="button" 
+              className={styles.modalCloseBtn}
+              onClick={() => setShowQrModal(false)}
+              aria-label="Close modal"
+            >
+              ✕
+            </button>
+            <h2 className={styles.modalTitle}>Scan to Send Wishes 💌</h2>
+            <p className={styles.modalDesc}>
+              Have friends scan this code with their phone cameras to post live wishes and balloons on your screen!
+            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(wishUrl)}`} 
+              alt="Wishes Page QR Code" 
+              className={styles.modalQrImg}
+            />
+            <div className={styles.modalLinkBox}>
+              <span className={styles.modalLinkText}>{wishUrl}</span>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,0 +1,110 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+.visible {
+  transform: translate(-50%, 16px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hidden {
+  transform: translate(-50%, -100%) scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-6);
+  background: rgba(20, 16, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg), 0 0 15px rgba(155, 93, 229, 0.15);
+  backdrop-filter: blur(16px);
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.navLink:hover {
+  color: var(--text-base);
+  transform: translateY(-1px);
+}
+
+.divider {
+  color: rgba(255, 255, 255, 0.15);
+  font-size: var(--text-sm);
+  user-select: none;
+}
+
+/* Floating pull-down tab when header is hidden */
+.indicator {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px var(--space-4) 6px;
+  background: rgba(20, 16, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.indicator:hover {
+  background: rgba(28, 24, 56, 0.85);
+  color: var(--text-base);
+}
+
+.indVisible {
+  transform: translate(-50%, 0);
+  opacity: 0.75;
+  pointer-events: auto;
+}
+
+.indHidden {
+  transform: translate(-50%, -100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.indicatorArrow {
+  font-size: 8px;
+  line-height: 1;
+}
+
+.indicatorText {
+  font-weight: 600;
+}

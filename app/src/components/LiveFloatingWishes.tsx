@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getWishes } from '@/lib/wishesStore';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import type { Wish } from '@/lib/types';
 import styles from './LiveFloatingWishes.module.css';
 
@@ -14,7 +15,7 @@ export function LiveFloatingWishes({ celebrationId }: LiveFloatingWishesProps) {
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [visibleWishes, setVisibleWishes] = useState<{ wish: Wish; uniqueId: string }[]>([]);
 
-  // Poll for wishes every 3 seconds to get updates in real-time
+  // Load wishes initially and subscribe to new wishes in real-time
   useEffect(() => {
     const loadWishes = async () => {
       const allWishes = await getWishes(celebrationId);
@@ -22,8 +23,37 @@ export function LiveFloatingWishes({ celebrationId }: LiveFloatingWishesProps) {
     };
 
     loadWishes();
-    const interval = setInterval(loadWishes, 3000);
-    return () => clearInterval(interval);
+
+    if (!isSupabaseConfigured) {
+      // Fallback: poll for local storage changes in demo mode
+      const interval = setInterval(loadWishes, 3000);
+      return () => clearInterval(interval);
+    }
+
+    // Setup Realtime subscription for floating wishes
+    const channel = supabase
+      .channel(`wishes-floating-${celebrationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'wishes',
+          filter: `event_id=eq.${celebrationId}`,
+        },
+        (payload) => {
+          const newWish = payload.new as Wish;
+          setWishes((prev) => {
+            if (prev.some((w) => w.id === newWish.id)) return prev;
+            return [newWish, ...prev];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [celebrationId]);
 
   // Stagger showing wishes in bubbles

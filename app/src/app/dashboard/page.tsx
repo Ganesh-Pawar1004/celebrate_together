@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [events, setEvents] = useState<CelebrationEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     async function load() {
@@ -24,6 +25,15 @@ export default function DashboardPage() {
         setLoading(false);
         return;
       }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login';
+        return;
+      }
+
+      setUser(session.user);
+
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -33,6 +43,13 @@ export default function DashboardPage() {
     }
     load();
   }, []);
+
+  const handleSignOut = async () => {
+    if (isSupabaseConfigured) {
+      await supabase.auth.signOut();
+      window.location.href = '/';
+    }
+  };
 
   const copyLink = async (ev: CelebrationEvent) => {
     const url = `${window.location.origin}/celebrate/${ev.share_slug}`;
@@ -58,11 +75,20 @@ export default function DashboardPage() {
         <header className={styles.header}>
           <div>
             <h1 className={styles.title}>My Celebrations</h1>
-            <p className={styles.subtitle}>Manage and track all your shared surprises.</p>
+            <p className={styles.subtitle}>
+              {user ? `Logged in as ${user.email}` : 'Manage and track all your shared surprises.'}
+            </p>
           </div>
-          <Link href="/create" className="btn btn--primary">
-            + New Celebration
-          </Link>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+            {user && (
+              <button onClick={handleSignOut} className="btn btn--ghost">
+                Sign Out
+              </button>
+            )}
+            <Link href="/create" className="btn btn--primary">
+              + New Celebration
+            </Link>
+          </div>
         </header>
 
         {/* Loading */}

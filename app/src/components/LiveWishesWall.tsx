@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { getWishes } from '@/lib/wishesStore';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import type { Wish, EventType } from '@/lib/types';
 import styles from './LiveWishesWall.module.css';
 
@@ -37,8 +38,38 @@ export function LiveWishesWall({ celebrationId, eventType }: LiveWishesWallProps
     };
 
     loadWishes();
-    const interval = setInterval(loadWishes, 3000);
-    return () => clearInterval(interval);
+
+    if (!isSupabaseConfigured) {
+      // Fallback: poll for local storage changes in demo mode
+      const interval = setInterval(loadWishes, 3000);
+      return () => clearInterval(interval);
+    }
+
+    // Setup Realtime subscription
+    const channel = supabase
+      .channel(`wishes-wall-${celebrationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'wishes',
+          filter: `event_id=eq.${celebrationId}`,
+        },
+        (payload) => {
+          const newWish = payload.new as Wish;
+          setWishes((prev) => {
+            if (prev.some((w) => w.id === newWish.id)) return prev;
+            return [newWish, ...prev];
+          });
+          setRotations((prev) => [Math.random() * 6 - 3, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [celebrationId]);
 
   if (wishes.length === 0) return null;

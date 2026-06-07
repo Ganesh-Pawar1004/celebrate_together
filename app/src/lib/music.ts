@@ -57,6 +57,13 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     occasions: ['engagement', 'graduation', 'promotion'],
   },
   {
+    id: 'search',
+    label: 'Search Free Library',
+    emoji: '🔍',
+    url: '',
+    occasions: [],
+  },
+  {
     id: 'custom',
     label: 'Upload your own',
     emoji: '📂',

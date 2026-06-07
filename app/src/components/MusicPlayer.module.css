@@ -107,6 +107,32 @@
 .playBtn.playing { background: rgba(232, 83, 74, 0.4); border: 1px solid rgba(232, 83, 74, 0.6); }
 .playBtn:focus-visible { outline: 2px solid #e8534a; outline-offset: 2px; }
 
+.muteBtn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, #9990cc);
+  flex-shrink: 0;
+  transition: background-color 0.15s, transform 0.15s, color 0.15s;
+}
+
+.muteBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--text-primary, #f0eeff);
+  transform: scale(1.1);
+}
+
+.muteBtn:focus-visible {
+  outline: 2px solid #e8534a;
+  outline-offset: 2px;
+}
+
 .note { font-size: 0.9rem; line-height: 1; }
 .noteAnimating { animation: noteBounce 1.8s ease-in-out infinite; }
 

@@ -159,7 +159,7 @@ export function LiveCakeDisplay({ flavor, recipientName, onComplete, eventType }
         </div>
 
         {/* Click target for cutting (only active when candles are unlit/celebration started) */}
-        {(!candlesLit || !isBirthday) && (
+        {!candlesLit && (
           <div 
             className={styles.clickTarget} 
             onClick={handleCutSlice}
