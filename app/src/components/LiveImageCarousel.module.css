@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
+
 .overlay {
   position: absolute;
   inset: 0;
@@ -13,40 +15,52 @@
   position: absolute;
   background-color: #ffffff;
   padding: 8px;
-  padding-bottom: 24px;
-  border-radius: 2px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35), 0 5px 15px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 4px;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 3px 10px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s ease;
 }
 
 @media (min-width: 768px) {
   .polaroid {
     padding: 12px;
-    padding-bottom: 40px;
+    padding-bottom: 6px;
+    border-radius: 6px;
   }
+}
+
+.polaroid:hover {
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .tape {
   position: absolute;
-  top: -8px;
+  top: -12px;
   left: 50%;
-  transform: translateX(-50%) rotate(-2deg);
-  width: 48px;
-  height: 16px;
-  background-color: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(2px);
+  transform: translateX(-50%) rotate(-3deg);
+  width: 55px;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(3px);
   z-index: 5;
+  /* Torn tape edges */
+  border-left: 2px dotted rgba(0, 0, 0, 0.1);
+  border-right: 2px dotted rgba(0, 0, 0, 0.1);
 }
 
 .imageContainer {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1 / 1;
   background-color: #f7fafc;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #edf2f7;
+  border-radius: 2px;
 }
 
 .image {
@@ -54,4 +68,108 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.caption {
+  font-family: 'Caveat', cursive, sans-serif;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 2px;
+  font-weight: 700;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+  .caption {
+    font-size: 1.45rem;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+}
+
+/* Lightbox Styles */
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(6, 4, 15, 0.88);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  padding: 24px;
+}
+
+.lightboxCard {
+  background-color: #ffffff;
+  padding: 16px;
+  padding-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 480px;
+  position: relative;
+  cursor: default;
+}
+
+.lightboxImageWrapper {
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+  background-color: #0f0d1a;
+  aspect-ratio: 1 / 1;
+}
+
+.lightboxImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.lightboxCaption {
+  font-family: 'Caveat', cursive, sans-serif;
+  font-size: 2.2rem;
+  color: #1a202c;
+  text-align: center;
+  margin-top: 14px;
+  margin-bottom: 4px;
+  font-weight: 700;
+  user-select: none;
+}
+
+.lightboxCloseBtn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #1a202c;
+  border: none;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
+  z-index: 1010;
+}
+
+.lightboxCloseBtn:hover {
+  transform: scale(1.15);
+  background-color: #f7fafc;
 }

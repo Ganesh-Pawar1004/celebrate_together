@@ -400,7 +400,7 @@ export default function LiveCelebrationPage() {
               className={styles.partyContainer}
             >
               {/* Floating images in background */}
-              {photos.length > 0 && <LiveImageCarousel images={photos} />}
+              {photos.length > 0 && <LiveImageCarousel images={photos} eventType={event.event_type} />}
 
               {/* Floating wishes bubbles */}
               <LiveFloatingWishes celebrationId={event.id} />
