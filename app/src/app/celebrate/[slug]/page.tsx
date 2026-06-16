@@ -7,7 +7,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { getEventBySlug } from '@/lib/localStore';
 import type { CelebrationEvent } from '@/lib/types';
 import { EVENT_LABELS, THEME_LABELS } from '@/lib/types';
-import { getCountdownParts, isRevealed, THEME_TOKENS } from '@/lib/utils';
+import { getCountdownParts, isRevealed, THEME_TOKENS, getGreeting, getCountdownTeaser } from '@/lib/utils';
 import { MUSIC_TRACKS } from '@/lib/music';
 import MusicPlayer from '@/components/MusicPlayer';
 import TypewriterText from '@/components/TypewriterText';
@@ -136,8 +136,8 @@ export default function CelebratePage() {
   // Apply theme CSS variables
   const themeStyle = event
     ? (Object.fromEntries(
-        Object.entries(THEME_TOKENS[event.theme]).map(([k, v]) => [k, v])
-      ) as React.CSSProperties)
+      Object.entries(THEME_TOKENS[event.theme]).map(([k, v]) => [k, v])
+    ) as React.CSSProperties)
     : {};
 
   const eventInfo = event ? EVENT_LABELS[event.event_type] : null;
@@ -152,24 +152,30 @@ export default function CelebratePage() {
 
   return (
     <div className={styles.page} style={themeStyle} aria-live="polite" aria-atomic="true">
-      {/* Animated background particles */}
+      {/* Animated background particles — farewell gets drifting leaves, others get stars */}
       {event && pageState !== 'loading' && (
         <div className={styles.bgParticles} aria-hidden="true">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <span
-              key={i}
-              className={styles.bgParticle}
-              style={{
-                left: `${(i * 5 + 2) % 100}%`,
-                animationDuration: `${8 + (i % 7) * 2}s`,
-                animationDelay: `${(i % 5) * 1.2}s`,
-                fontSize: `${0.7 + (i % 4) * 0.3}rem`,
-                opacity: 0.4 + (i % 3) * 0.1,
-              }}
-            >
-              {['✨', '💫', '⭐', '🌟', '💖'][i % 5]}
-            </span>
-          ))}
+          {Array.from({ length: 20 }).map((_, i) => {
+            const isFarewell = event.event_type === 'farewell' || event.event_type === 'retirement';
+            const farewellParticles = ['🍂', '🍁', '🍃', '✨', '🌟'];
+            const defaultParticles = ['✨', '💫', '⭐', '🌟', '💖'];
+            const particles = isFarewell ? farewellParticles : defaultParticles;
+            return (
+              <span
+                key={i}
+                className={`${styles.bgParticle} ${isFarewell ? styles.bgParticleFarewell : ''}`}
+                style={{
+                  left: `${(i * 5 + 2) % 100}%`,
+                  animationDuration: `${(isFarewell ? 12 : 8) + (i % 7) * 2}s`,
+                  animationDelay: `${(i % 5) * 1.2}s`,
+                  fontSize: `${0.7 + (i % 4) * 0.3}rem`,
+                  opacity: 0.4 + (i % 3) * 0.1,
+                }}
+              >
+                {particles[i % 5]}
+              </span>
+            );
+          })}
         </div>
       )}
 
@@ -205,8 +211,11 @@ export default function CelebratePage() {
       {/* ── WAITING / COUNTDOWN ── */}
       {pageState === 'waiting' && event && (
         <div className={styles.waitingSection}>
-          <div className={styles.giftPulse} aria-hidden="true">🎁</div>
-          <p className={styles.surpriseHint}>You have a surprise waiting...</p>
+          <div className={styles.giftPulse} aria-hidden="true">
+            {event.event_type === 'farewell' || event.event_type === 'retirement' ? '👋' :
+              event.event_type === 'get_well_soon' ? '🌸' : '🎁'}
+          </div>
+          <p className={styles.surpriseHint}>{getCountdownTeaser(event.event_type)}</p>
           <h1 className={styles.forName}>
             For <span className={styles.nameHighlight}>{event.recipient_name}</span>
           </h1>
@@ -247,9 +256,15 @@ export default function CelebratePage() {
 
           <div className={styles.revealCard}>
             <p className={styles.revealHappy}>
-              Happy {EVENT_LABELS[event.event_type].label}!
+              {getGreeting(event.event_type, event.recipient_name, event.custom_label)}
             </p>
-            <h1 className={styles.revealName}>{event.recipient_name} 🎊</h1>
+            <h1 className={styles.revealName}>
+              {event.event_type === 'farewell' || event.event_type === 'retirement'
+                ? `${event.recipient_name} ✨`
+                : event.event_type === 'get_well_soon'
+                  ? `${event.recipient_name} 🌸`
+                  : `${event.recipient_name} 🎊`}
+            </h1>
 
             {/* Optional photo */}
             {event.photo_url && (() => {
@@ -259,7 +274,7 @@ export default function CelebratePage() {
                 if (Array.isArray(parsed) && parsed.length > 0) {
                   firstPhoto = parsed[0];
                 }
-              } catch {}
+              } catch { }
               if (!firstPhoto) return null;
               return (
                 <div className={styles.revealPhotoWrapper}>
@@ -291,8 +306,8 @@ export default function CelebratePage() {
 
           {/* Real-time Live Interactive Celebration Button */}
           <div className={styles.liveCelebrateSection}>
-            <Link 
-              href={`/celebrate/${slug}/live`} 
+            <Link
+              href={`/celebrate/${slug}/live`}
               className={`btn btn--primary btn--lg ${styles.liveCelebrateBtn}`}
             >
               🎉 Let&apos;s Celebrate the Moment! 🎂

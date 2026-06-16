@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid';
 import { format, formatDistanceToNow } from 'date-fns';
-import type { Theme } from './types';
+import type { Theme, EventType } from './types';
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
 
@@ -118,7 +118,71 @@ export const THEME_TOKENS: Record<Theme, ThemeTokens> = {
     '--border-color': '#1e3020',
     '--particle-color': '#4caf7d',
   },
+  golden_sunset: {
+    '--bg-primary': '#120a04',
+    '--bg-secondary': '#1e1008',
+    '--bg-surface': '#2c1a0c',
+    '--text-primary': '#fef3e2',
+    '--text-secondary': '#e8c88a',
+    '--accent-primary': '#d4a853',
+    '--accent-secondary': '#c4714a',
+    '--border-color': '#3a2010',
+    '--particle-color': '#d4a853',
+  },
 };
+
+/**
+ * Returns a heartfelt, event-appropriate greeting line.
+ * Replaces the generic "Happy {label}!" pattern.
+ */
+export function getGreeting(
+  eventType: EventType,
+  recipientName: string,
+  customLabel?: string | null
+): string {
+  const name = recipientName.trim();
+  switch (eventType) {
+    case 'birthday':      return `Happy Birthday, ${name}! 🎂`;
+    case 'anniversary':   return `Happy Anniversary! 💍`;
+    case 'baby_shower':   return `Congratulations, ${name}! 🍼`;
+    case 'valentine':     return `Happy Valentine's Day! 💖`;
+    case 'engagement':    return `Congratulations, ${name}! 💎`;
+    case 'graduation':    return `Congratulations, ${name}! 🎓`;
+    case 'promotion':     return `Congratulations, ${name}! 💼`;
+    case 'housewarming':  return `Welcome Home, ${name}! 🏠`;
+    case 'just_because':  return `This is for you, ${name}! 🎉`;
+    case 'farewell':      return `We'll Miss You, ${name}! 👋`;
+    case 'retirement':    return `Happy Retirement, ${name}! 🏖️`;
+    case 'get_well_soon': return `Get Well Soon, ${name}! 🌸`;
+    case 'new_job':       return `Congrats on the New Role, ${name}! 🚀`;
+    case 'custom':
+      return customLabel
+        ? `${customLabel}, ${name}! ✨`
+        : `Celebrating You, ${name}! ✨`;
+    default:              return `Celebrating You, ${name}! 🎉`;
+  }
+}
+
+/**
+ * Returns an event-aware teaser line shown on the countdown / waiting screen.
+ */
+export function getCountdownTeaser(eventType: EventType): string {
+  switch (eventType) {
+    case 'birthday':      return '🎂 Something sweet is waiting for you...';
+    case 'anniversary':   return '💍 A special memory is being unwrapped...';
+    case 'baby_shower':   return '🍼 A little surprise is on its way...';
+    case 'valentine':     return '💖 Something lovely awaits...';
+    case 'engagement':    return '💎 A beautiful surprise is being revealed...';
+    case 'graduation':    return '🎓 A proud moment is about to be shared...';
+    case 'promotion':     return '🚀 A celebration is on the way...';
+    case 'housewarming':  return '🏠 A warm welcome is being prepared...';
+    case 'farewell':      return '👋 A heartfelt goodbye is being prepared...';
+    case 'retirement':    return '🏖️ A legendary farewell awaits...';
+    case 'get_well_soon': return '🌸 Warm healing wishes are on their way...';
+    case 'new_job':       return '🚀 A cheer for your next chapter awaits...';
+    default:              return '🎁 You have a surprise waiting...';
+  }
+}
 
 export function getMidnightTonight(): Date {
   const midnight = new Date();

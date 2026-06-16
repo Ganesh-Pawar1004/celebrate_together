@@ -52,9 +52,30 @@ export const MUSIC_TRACKS: MusicTrack[] = [
   {
     id: 'cinematic',
     label: 'Cinematic',
-    emoji: '🎬',
+    emoji: '🎦',
     url: '/music/cinematic.mp3',
     occasions: ['engagement', 'graduation', 'promotion'],
+  },
+  {
+    id: 'nostalgic_farewell',
+    label: 'Nostalgic & Warm',
+    emoji: '🌅',
+    url: '/music/romantic.mp3', // warm piano — repurposed for farewell until dedicated track added
+    occasions: ['farewell', 'retirement', 'get_well_soon'],
+  },
+  {
+    id: 'hopeful_new_chapter',
+    label: 'Hopeful & Uplifting',
+    emoji: '🌟',
+    url: '/music/upbeat.mp3',
+    occasions: ['new_job', 'graduation', 'promotion'],
+  },
+  {
+    id: 'gentle_healing',
+    label: 'Gentle & Soothing',
+    emoji: '🌸',
+    url: '/music/soft.mp3',
+    occasions: ['get_well_soon', 'baby_shower'],
   },
   {
     id: 'search',

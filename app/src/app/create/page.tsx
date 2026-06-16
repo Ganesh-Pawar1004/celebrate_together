@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { Play, Pause, Search, Loader2 } from 'lucide-react';
 import type { EventType, Theme } from '@/lib/types';
-import { EVENT_LABELS, THEME_LABELS } from '@/lib/types';
+import { EVENT_LABELS, THEME_LABELS, THEME_SUGGESTIONS } from '@/lib/types';
 import { generateSlug, getMidnightTonight, toLocalISOString, THEME_TOKENS } from '@/lib/utils';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { saveEventLocally } from '@/lib/localStore';
@@ -17,6 +17,8 @@ const STEPS = ['Occasion', 'Personalise', 'Theme & Music', 'Schedule', 'Share'];
 
 interface FormData {
   event_type: EventType;
+  /** Only shown/used when event_type is 'custom' — lets creator name the celebration */
+  custom_label: string;
   recipient_name: string;
   sender_name: string;
   custom_message: string;
@@ -31,6 +33,7 @@ interface FormData {
 
 const defaultForm: FormData = {
   event_type: 'birthday',
+  custom_label: '',
   recipient_name: '',
   sender_name: '',
   custom_message: '',
@@ -302,6 +305,7 @@ function CreatePageInner() {
       share_slug: newSlug,
       creator_id: null,
       event_type: form.event_type,
+      custom_label: form.custom_label.trim() || null,
       recipient_name: form.recipient_name,
       sender_name: form.sender_name,
       custom_message: form.custom_message,
@@ -412,16 +416,25 @@ function CreatePageInner() {
             <h1 className={styles.stepTitle}>What are you celebrating?</h1>
             <p className={styles.stepDesc}>Choose the occasion for this special surprise.</p>
             <ul className={styles.occasionGrid} role="list">
-              {(Object.entries(EVENT_LABELS) as [EventType, { label: string; emoji: string }][]).map(([key, { label, emoji }]) => (
+              {(Object.entries(EVENT_LABELS) as [EventType, { label: string; emoji: string; description: string }][]).map(([key, { label, emoji, description }]) => (
                 <li key={key}>
                   <button
                     type="button"
                     className={`${styles.occasionBtn} ${form.event_type === key ? styles.selected : ''}`}
-                    onClick={() => { update('event_type', key); next(); }}
+                    onClick={() => {
+                      // Auto-suggest the best matching theme
+                      const suggestedTheme = THEME_SUGGESTIONS[key];
+                      const defaultMusic = getDefaultTrack(key);
+                      update('event_type', key);
+                      update('theme', suggestedTheme);
+                      update('music_preset', defaultMusic.id);
+                      next();
+                    }}
                     aria-pressed={form.event_type === key}
                   >
                     <span className={styles.occasionEmoji}>{emoji}</span>
                     <span className={styles.occasionLabel}>{label}</span>
+                    <span className={styles.occasionDesc}>{description}</span>
                   </button>
                 </li>
               ))}
@@ -435,6 +448,25 @@ function CreatePageInner() {
             <h1 className={styles.stepTitle}>Personalise the celebration</h1>
             <p className={styles.stepDesc}>These details will appear in the surprise reveal.</p>
             <div className={styles.formStack}>
+
+              {/* Custom label — shown when event_type needs a name */}
+              {(form.event_type === 'custom') && (
+                <div className="form-group">
+                  <label className="form-label" htmlFor="custom-label">
+                    What are you celebrating? <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="custom-label"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Team Win, Rohan's Last Day, Project Launch..."
+                    value={form.custom_label}
+                    onChange={(e) => update('custom_label', e.target.value)}
+                    maxLength={60}
+                  />
+                  <span className="form-hint">This becomes the celebration headline (instead of &quot;Custom&quot;)</span>
+                </div>
+              )}
               <div className={styles.nameRow}>
                 <div className="form-group">
                   <label className="form-label" htmlFor="recipient-name">
@@ -444,7 +476,7 @@ function CreatePageInner() {
                     id="recipient-name"
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Ganesh"
+                    placeholder="e.g. Name"
                     value={form.recipient_name}
                     onChange={(e) => update('recipient_name', e.target.value)}
                     maxLength={60}
@@ -462,7 +494,7 @@ function CreatePageInner() {
                     id="sender-name"
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Durgaa"
+                    placeholder="e.g. Your Name"
                     value={form.sender_name}
                     onChange={(e) => update('sender_name', e.target.value)}
                     maxLength={60}

@@ -81,6 +81,11 @@ export default function LiveCelebrationPage() {
           return ['💼', '📈', '🚀', '✨', '🎉', '👏'];
         case 'housewarming':
           return ['🏠', '🔑', '🏡', '✨', '🎉', '🥂'];
+        case 'farewell':
+        case 'retirement':
+          return ['✨', '🍂', '🍁', '🍃', '🌟', '🌅'];
+        case 'get_well_soon':
+          return ['🌸', '🌺', '🌷', '✨', '💖', '🌼'];
         default:
           return ['✨', '🎉', '💫', '🎈', '💖', '🌟'];
       }
@@ -243,6 +248,22 @@ export default function LiveCelebrationPage() {
         subtitle: 'You worked hard for this milestone. Let\'s celebrate your amazing achievement! 🌟',
         btn: 'Start the Celebration! 🚀',
         header: 'SUCCESS!'
+      };
+    }
+    if (type === 'farewell' || type === 'retirement') {
+      return {
+        title: 'A Beautiful Journey',
+        subtitle: 'Unpack the memories we\'ve shared and look forward to the next chapter! 🌅',
+        btn: 'Open the Memory Box 📦',
+        header: 'WE WILL MISS YOU!'
+      };
+    }
+    if (type === 'get_well_soon') {
+      return {
+        title: 'Healing Thoughts',
+        subtitle: 'Sending you warmth, love, and a garden of healing wishes! 🌸',
+        btn: 'Water the Flowers 💧',
+        header: 'GET WELL SOON!'
       };
     }
     return {

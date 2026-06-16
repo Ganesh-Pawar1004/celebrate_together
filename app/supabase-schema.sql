@@ -38,6 +38,7 @@ create table if not exists public.events (
   id uuid primary key default gen_random_uuid(),
   creator_id uuid references public.profiles(id) on delete set null,
   event_type text not null default 'birthday',
+  custom_label text,
   recipient_name text not null,
   sender_name text not null,
   custom_message text not null,
@@ -113,10 +114,12 @@ create policy "Creators can see reactions"
 -- Live Celebration Features Additions
 -- =============================================================
 
--- Add cake_flavor and additional_photos columns if not present
+-- Add new columns if not present (run after initial schema creation)
 alter table public.events 
   add column if not exists cake_flavor text default 'chocolate',
-  add column if not exists additional_photos text;
+  add column if not exists additional_photos text,
+  add column if not exists custom_music_data text,
+  add column if not exists custom_label text;
 
 -- Wishes Table
 create table if not exists public.wishes (
