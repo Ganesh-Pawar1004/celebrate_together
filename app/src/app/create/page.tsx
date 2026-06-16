@@ -29,6 +29,10 @@ interface FormData {
   photo_url: string | null; // Stores JSON array of base64 images
   scheduled_at: string;
   cake_flavor: 'chocolate' | 'vanilla' | 'strawberry' | 'red-velvet';
+  cake_type: 'classic' | 'tiered' | 'cupcake' | 'cheesecake';
+  candle_count: number | null;
+  cake_topper: 'candles' | 'heart' | 'flag' | 'flowers';
+  cake_decorations: 'none' | 'sprinkles' | 'stars' | 'floral';
 }
 
 const defaultForm: FormData = {
@@ -43,6 +47,10 @@ const defaultForm: FormData = {
   photo_url: null,
   scheduled_at: toLocalISOString(getMidnightTonight()),
   cake_flavor: 'chocolate',
+  cake_type: 'classic',
+  candle_count: null,
+  cake_topper: 'candles',
+  cake_decorations: 'none',
 };
 
 function CreatePageInner() {
@@ -291,9 +299,14 @@ function CreatePageInner() {
     if (err) { setError(err); return; }
     setError('');
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const prev = () => { setError(''); setStep((s) => Math.max(s - 1, 0)); };
+  const prev = () => { 
+    setError(''); 
+    setStep((s) => Math.max(s - 1, 0)); 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -323,6 +336,10 @@ function CreatePageInner() {
     const eventPayload = {
       ...basePayload,
       cake_flavor: form.cake_flavor,
+      cake_type: form.cake_type,
+      candle_count: form.candle_count,
+      cake_topper: form.cake_topper,
+      cake_decorations: form.cake_decorations,
     };
 
     if (!isSupabaseConfigured) {
@@ -345,8 +362,7 @@ function CreatePageInner() {
       const { error: retryErr } = await supabase.from('events').insert(supabaseBasePayload);
       if (retryErr) {
         console.warn('Base insert failed (custom_music_data), falling back to minimal insert:', retryErr);
-        // Exclude both cake_flavor and custom_music_data for a graceful minimal fallback
-        const { cake_flavor, custom_music_data, ...minimalPayload } = supabaseEventPayload;
+        const { cake_flavor, cake_type, candle_count, cake_topper, cake_decorations, custom_music_data, ...minimalPayload } = supabaseEventPayload;
         const { error: minimalErr } = await supabase.from('events').insert(minimalPayload);
         if (minimalErr) {
           setError('Could not save your celebration. Please check your database schema and try again.');
@@ -589,22 +605,109 @@ function CreatePageInner() {
                 {photoError && <p className="form-error" style={{ marginTop: '0.25rem' }}>{photoError}</p>}
               </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="cake-flavor">
-                  Celebration Cake Flavor
-                </label>
-                <select
-                  id="cake-flavor"
-                  className="form-select"
-                  value={form.cake_flavor}
-                  onChange={(e) => update('cake_flavor', e.target.value as any)}
-                >
-                  <option value="chocolate">Chocolate 🍫</option>
-                  <option value="vanilla">Vanilla 🍦</option>
-                  <option value="strawberry">Strawberry 🍓</option>
-                  <option value="red-velvet">Red Velvet 🍰</option>
-                </select>
+              <div className={styles.subHeading} style={{ marginTop: '1.5rem' }}>🎂 Virtual Cake Designer</div>
+              <p className="form-hint" style={{ marginTop: '-0.5rem', marginBottom: '1rem' }}>
+                Customize the interactive cake that they will cut to reveal the surprise!
+              </p>
+              
+              <div className={styles.nameRow}>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="cake-type">Cake Style</label>
+                  <select
+                    id="cake-type"
+                    className="form-select"
+                    value={form.cake_type}
+                    onChange={(e) => update('cake_type', e.target.value as any)}
+                  >
+                    <option value="classic">Classic Round 🎂</option>
+                    <option value="tiered">2-Tier Grand 🏰</option>
+                    <option value="cupcake">Cute Cupcake 🧁</option>
+                    <option value="cheesecake">Cheesecake Slice 🍰</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="cake-flavor">Cake Flavor</label>
+                  <select
+                    id="cake-flavor"
+                    className="form-select"
+                    value={form.cake_flavor}
+                    onChange={(e) => update('cake_flavor', e.target.value as any)}
+                  >
+                    <option value="chocolate">Chocolate 🍫</option>
+                    <option value="vanilla">Vanilla 🍦</option>
+                    <option value="strawberry">Strawberry 🍓</option>
+                    <option value="red-velvet">Red Velvet 🍰</option>
+                  </select>
+                </div>
               </div>
+
+              <div className={styles.nameRow}>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="cake-topper">Topper</label>
+                  <select
+                    id="cake-topper"
+                    className="form-select"
+                    value={form.cake_topper}
+                    onChange={(e) => update('cake_topper', e.target.value as any)}
+                  >
+                    <option value="candles">Lit Candles 🕯️</option>
+                    <option value="heart">Glowing Heart 💖</option>
+                    <option value="flag">Celebration Flag 🚩</option>
+                    <option value="flowers">Floral Bouquet 🌸</option>
+                  </select>
+                </div>
+
+                {form.cake_topper === 'candles' && (
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="candle-count">Number of Candles (Optional)</label>
+                    <input
+                      id="candle-count"
+                      type="number"
+                      className="form-input"
+                      placeholder="e.g. 25"
+                      min="1"
+                      max="100"
+                      value={form.candle_count || ''}
+                      onChange={(e) => update('candle_count', e.target.value ? parseInt(e.target.value, 10) : null)}
+                    />
+                  </div>
+                )}
+
+                {form.cake_topper !== 'candles' && (
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="cake-decorations">Decorations</label>
+                    <select
+                      id="cake-decorations"
+                      className="form-select"
+                      value={form.cake_decorations}
+                      onChange={(e) => update('cake_decorations', e.target.value as any)}
+                    >
+                      <option value="none">Smooth (None)</option>
+                      <option value="sprinkles">Rainbow Sprinkles ✨</option>
+                      <option value="stars">Gold Stars ⭐</option>
+                      <option value="floral">Edible Flowers 🌸</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {form.cake_topper === 'candles' && (
+                <div className="form-group">
+                  <label className="form-label" htmlFor="cake-decorations-candles">Decorations</label>
+                  <select
+                    id="cake-decorations-candles"
+                    className="form-select"
+                    value={form.cake_decorations}
+                    onChange={(e) => update('cake_decorations', e.target.value as any)}
+                  >
+                    <option value="none">Smooth (None)</option>
+                    <option value="sprinkles">Rainbow Sprinkles ✨</option>
+                    <option value="stars">Gold Stars ⭐</option>
+                    <option value="floral">Edible Flowers 🌸</option>
+                  </select>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -625,7 +728,12 @@ function CreatePageInner() {
                     type="button"
                     className={`theme-card ${form.theme === key ? 'theme-card--selected' : ''}`}
                     style={{ background: tokens['--bg-secondary'] }}
-                    onClick={() => update('theme', key)}
+                    onClick={() => {
+                      update('theme', key);
+                      setTimeout(() => {
+                        document.getElementById('music-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }}
                     aria-pressed={form.theme === key}
                   >
                     <div
@@ -647,7 +755,7 @@ function CreatePageInner() {
               })}
             </div>
 
-            <h2 className={styles.subHeading} style={{ marginTop: 'var(--space-8)' }}>Background Music</h2>
+            <h2 id="music-section" className={styles.subHeading} style={{ marginTop: 'var(--space-8)' }}>Background Music</h2>
             <p className={styles.stepDesc}>
               Plays softly when your loved one opens the surprise.
             </p>

@@ -31,6 +31,14 @@
   z-index: 20;
 }
 
+.candlesWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
 .cakeBody {
   position: relative;
   width: 256px;
@@ -60,6 +68,12 @@
   transform: rotate(-4deg);
   text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
   user-select: none;
+  z-index: 10;
+  position: relative;
+}
+
+.shape_tiered .recipientName {
+  transform: rotate(-4deg) translateY(15px); /* Push text down so it's not covered by top tier */
 }
 
 .cakeSide {
@@ -231,5 +245,130 @@
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--accent-hover, var(--accent)));
   border-radius: var(--radius-full);
-  transition: width 0.3s ease;
+  transition: width 0.3s ease-out;
+}
+
+/* --- Dynamic Shapes --- */
+
+/* Cuttable Knife Cursor */
+.cuttable .clickTarget {
+  cursor: crosshair; /* Fallback */
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5.34a2 2 0 0 1 .59-1.41l9-9a2 2 0 0 1 2.82 0l6 6a2 2 0 0 1 .59 1.41Z'/><path d='m8.29 8.29 5.42 5.42'/></svg>") 0 32, auto;
+}
+
+.shape_tiered .topTier {
+  position: absolute;
+  bottom: calc(100% - 40px); /* Sits exactly in the center of the base cakeSurface oval */
+  left: 20%;
+  width: 60%;
+  height: 60px;
+  border-radius: 0 0 50% 50% / 0 0 15px 15px;
+  z-index: 5;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3); /* Shadow cast by top tier onto base tier */
+}
+.shape_tiered .tierTop {
+  position: absolute;
+  top: -15px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: inset 0 2px 5px rgba(255,255,255,0.2);
+}
+.shape_tiered .cakeSurface {
+  z-index: 0;
+}
+/* Raise decorations so candles sit on the top tier instead of base tier */
+.shape_tiered + .decorationsContainer {
+  /* This targets decorationsContainer if we place it after cakeBody in HTML. But they are not siblings in that order. We need to handle this in TSX or via parent. */
+}
+
+.shape_cupcake {
+  transform: scale(0.6);
+}
+.shape_cupcake .cakeSide {
+  border-radius: 10px 10px 40px 40px;
+  width: 80%;
+  left: 10%;
+}
+
+.shape_cheesecake .cakeSide {
+  height: 60px;
+  border-radius: 0 0 20px 20px;
+}
+.shape_cheesecake .cakeSurface {
+  border-radius: 50% 50% 0 0 / 15px 15px 0 0;
+}
+
+/* --- Number Candles --- */
+.numberCandle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #ff9e00;
+  text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff;
+  z-index: 10;
+  margin: 0 5px;
+}
+.numberCandle .flame {
+  position: absolute;
+  top: -20px;
+  width: 12px;
+  height: 20px;
+  background: #ffaa00;
+  border-radius: 50% 50% 20% 20%;
+  box-shadow: 0 0 15px #ffaa00, 0 0 30px #ff5500;
+  animation: flicker 0.1s infinite alternate;
+}
+.numberCandle .flame.extinguished {
+  display: none;
+}
+
+/* --- Slice Visual --- */
+.cutOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* --- Decorations --- */
+.decorationsPattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.decor_sprinkles {
+  background-image: 
+    radial-gradient(#ff0000 15%, transparent 16%),
+    radial-gradient(#00ff00 15%, transparent 16%),
+    radial-gradient(#0000ff 15%, transparent 16%),
+    radial-gradient(#ffff00 15%, transparent 16%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px, 10px 0, 0 10px;
+}
+
+.decor_stars {
+  background-image: radial-gradient(#ffd700 20%, transparent 25%);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}
+
+.decor_floral {
+  background-image: radial-gradient(#ff69b4 20%, transparent 25%), radial-gradient(#fff 10%, transparent 15%);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
 }

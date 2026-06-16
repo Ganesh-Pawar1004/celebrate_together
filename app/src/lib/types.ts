@@ -44,6 +44,10 @@ export interface CelebrationEvent {
   created_at: string;
   view_count: number;
   cake_flavor?: 'chocolate' | 'vanilla' | 'strawberry' | 'red-velvet' | null;
+  cake_type?: 'classic' | 'tiered' | 'cupcake' | 'cheesecake' | null;
+  candle_count?: number | null;
+  cake_topper?: 'candles' | 'heart' | 'flag' | 'flowers' | null;
+  cake_decorations?: 'none' | 'sprinkles' | 'stars' | 'floral' | null;
   additional_photos?: string | null; // JSON string array of base64 images
 }
 

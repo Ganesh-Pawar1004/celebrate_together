@@ -9,7 +9,10 @@ import { addWish } from '@/lib/wishesStore';
 import type { CelebrationEvent } from '@/lib/types';
 import { EVENT_LABELS } from '@/lib/types';
 import { THEME_TOKENS } from '@/lib/utils';
+
 import styles from './page.module.css';
+
+type WishStatus = 'idle' | 'submitting' | 'animating' | 'submitted';
 
 export default function WishPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -17,8 +20,7 @@ export default function WishPage() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<WishStatus>('idle');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -63,18 +65,17 @@ export default function WishPage() {
       }
     }
     
-    setSubmitting(true);
+    setStatus('submitting');
     setError('');
 
     try {
       await addWish(event.id, name.trim(), message.trim());
       localStorage.setItem(`last_wish_submitted_${event.share_slug}`, Date.now().toString());
-      setSubmitted(true);
+      setStatus('submitted');
     } catch (err) {
       console.error(err);
       setError('Could not submit your wish. Please try again.');
-    } finally {
-      setSubmitting(false);
+      setStatus('idle');
     }
   };
 
@@ -122,7 +123,7 @@ export default function WishPage() {
 
   const eventInfo = EVENT_LABELS[event.event_type];
 
-  if (submitted) {
+  if (status === 'submitted') {
     return (
       <div className={styles.page} style={themeStyle}>
         <div className={styles.formCard} style={{ textAlign: 'center' }}>
@@ -141,6 +142,8 @@ export default function WishPage() {
 
   return (
     <div className={styles.page} style={themeStyle}>
+
+
       <div className={styles.formCard}>
         <div className={styles.header}>
           <span className={styles.eventEmoji}>{eventInfo?.emoji ?? '🎉'}</span>
@@ -162,7 +165,7 @@ export default function WishPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Sarah"
               maxLength={50}
-              disabled={submitting}
+              disabled={status === 'submitting'}
             />
             <div className={styles.charCounter}>{name.length} / 50 characters</div>
           </div>
@@ -178,7 +181,7 @@ export default function WishPage() {
               placeholder="Write a sweet wish, funny memory, or supportive blessing..."
               maxLength={500}
               rows={4}
-              disabled={submitting}
+              disabled={status === 'submitting'}
             />
             <div className={styles.charCounter}>{message.length} / 500 characters</div>
           </div>
@@ -189,9 +192,9 @@ export default function WishPage() {
             type="submit"
             className="btn btn--primary btn--lg"
             style={{ width: '100%', marginTop: 'var(--space-2)' }}
-            disabled={submitting}
+            disabled={status === 'submitting'}
           >
-            {submitting ? 'Sending...' : '💌 Send Wishes'}
+            {status === 'submitting' ? 'Sending...' : '💌 Send Wishes'}
           </button>
         </form>
       </div>

@@ -48,6 +48,10 @@ create table if not exists public.events (
   music_preset text default 'none',
   custom_music_data text,
   cake_flavor text default 'chocolate',
+  cake_type text default 'classic',
+  candle_count integer,
+  cake_topper text default 'candles',
+  cake_decorations text default 'none',
   photo_url text,
   share_slug text unique not null,
   is_active boolean not null default true,
@@ -117,6 +121,10 @@ create policy "Creators can see reactions"
 -- Add new columns if not present (run after initial schema creation)
 alter table public.events 
   add column if not exists cake_flavor text default 'chocolate',
+  add column if not exists cake_type text default 'classic',
+  add column if not exists candle_count integer,
+  add column if not exists cake_topper text default 'candles',
+  add column if not exists cake_decorations text default 'none',
   add column if not exists additional_photos text,
   add column if not exists custom_music_data text,
   add column if not exists custom_label text;

@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Dancing+Script:wght@600&display=swap');
 
 /* ============================================================
    DESIGN TOKENS
    ============================================================ */
 :root {
+  color-scheme: dark;
   /* Brand palette */
   --brand-coral: #e8534a;
   --brand-gold: #f4a535;
@@ -368,6 +369,11 @@ p {
               background-color var(--transition-fast),
               box-shadow var(--transition-fast);
   -webkit-appearance: none;
+}
+
+.form-select option {
+  background-color: #1c1c24 !important;
+  color: #ffffff !important;
 }
 
 .form-input::placeholder,

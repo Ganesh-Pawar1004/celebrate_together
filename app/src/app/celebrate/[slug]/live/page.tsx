@@ -10,7 +10,7 @@ import { MUSIC_TRACKS } from '@/lib/music';
 import MusicPlayer from '@/components/MusicPlayer';
 import { LiveCakeDisplay } from '@/components/LiveCakeDisplay';
 import { LiveImageCarousel } from '@/components/LiveImageCarousel';
-import { LiveFloatingWishes } from '@/components/LiveFloatingWishes';
+import { LiveSparklesBackground } from '@/components/LiveSparklesBackground';
 import { LiveWishesWall } from '@/components/LiveWishesWall';
 import type { CelebrationEvent } from '@/lib/types';
 import { THEME_TOKENS } from '@/lib/utils';
@@ -405,6 +405,10 @@ export default function LiveCelebrationPage() {
             >
               <LiveCakeDisplay
                 flavor={event.cake_flavor ?? 'chocolate'}
+                cakeType={event.cake_type ?? 'classic'}
+                candleCount={event.candle_count}
+                topper={event.cake_topper ?? 'candles'}
+                decorations={event.cake_decorations ?? 'none'}
                 recipientName={event.recipient_name}
                 eventType={event.event_type}
                 onComplete={() => setStep('party')}
@@ -423,8 +427,8 @@ export default function LiveCelebrationPage() {
               {/* Floating images in background */}
               {photos.length > 0 && <LiveImageCarousel images={photos} eventType={event.event_type} />}
 
-              {/* Floating wishes bubbles */}
-              <LiveFloatingWishes celebrationId={event.id} />
+              {/* Sparkles Background */}
+              <LiveSparklesBackground />
 
               <div className={styles.partyHeader}>
                 <h1 className={styles.partyBounceTitle}>{occasionWord.header}</h1>

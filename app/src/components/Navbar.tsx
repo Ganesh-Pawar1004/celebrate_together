@@ -79,9 +79,9 @@ export default function Navbar() {
           ) : (
             <Link href="/login" className="btn btn--ghost btn--sm">Sign In</Link>
           )}
-          <Link href="/create" className="btn btn--primary btn--sm">
+          <a href="/create" className="btn btn--primary btn--sm">
             Create Celebration ✨
-          </Link>
+          </a>
         </div>
 
         {/* Mobile hamburger */}
@@ -130,9 +130,9 @@ export default function Navbar() {
               <li><Link href="/login" onClick={() => setMenuOpen(false)}>Sign In</Link></li>
             )}
             <li>
-              <Link href="/create" className="btn btn--primary" onClick={() => setMenuOpen(false)}>
+              <a href="/create" className="btn btn--primary" onClick={() => setMenuOpen(false)}>
                 Create Celebration ✨
-              </Link>
+              </a>
             </li>
           </ul>
         </div>

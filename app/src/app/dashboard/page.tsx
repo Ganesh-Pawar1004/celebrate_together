@@ -85,9 +85,9 @@ export default function DashboardPage() {
                 Sign Out
               </button>
             )}
-            <Link href="/create" className="btn btn--primary">
+            <a href="/create" className="btn btn--primary">
               + New Celebration
-            </Link>
+            </a>
           </div>
         </header>
 
