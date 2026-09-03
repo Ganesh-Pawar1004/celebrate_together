@@ -11,6 +11,7 @@ import { generateSlug, getMidnightTonight, toLocalISOString, THEME_TOKENS } from
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { saveEventLocally } from '@/lib/localStore';
 import { MUSIC_TRACKS, getDefaultTrack } from '@/lib/music';
+import { AICreateModal } from '@/components/AICreateModal';
 import styles from './page.module.css';
 
 const STEPS = ['Occasion', 'Personalise', 'Theme & Music', 'Schedule', 'Share'];
@@ -68,6 +69,14 @@ function CreatePageInner() {
   const [photoError, setPhotoError] = useState('');
   const [uploadingMusic, setUploadingMusic] = useState(false);
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
+  
+  // AI Feature state
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiVariantIndex, setAiVariantIndex] = useState(1);
+  const [aiPreviousMessages, setAiPreviousMessages] = useState<string[]>([]);
+  const [isRewriting, setIsRewriting] = useState(false);
+  
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Online library search state
@@ -84,6 +93,58 @@ function CreatePageInner() {
       }
     };
   }, []);
+
+  // AI Draft Integration
+  useEffect(() => {
+    if (params.get('draft') === 'true') {
+      try {
+        const draftStr = localStorage.getItem('ai_draft_celebration');
+        if (draftStr) {
+          const parsed = JSON.parse(draftStr);
+          // Handle both old format (just data) and new format ({data, prompt})
+          const aiData = parsed.data || parsed;
+          const originalPrompt = parsed.prompt || '';
+          
+          setForm(prev => ({ ...prev, ...aiData }));
+          if (originalPrompt) {
+            setAiPrompt(originalPrompt);
+            if (aiData.custom_message) {
+              setAiPreviousMessages([aiData.custom_message]);
+            }
+          }
+          
+          setStep(1); // Skip to Personalize step
+          localStorage.removeItem('ai_draft_celebration');
+          
+          // Optionally, remove the draft param from URL without reloading
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+        }
+      } catch (err) {
+        console.error('Failed to load AI draft:', err);
+      }
+    }
+  }, [params]);
+
+  const handleRewriteMessage = async () => {
+    if (!aiPrompt) return;
+    setIsRewriting(true);
+    setError('');
+    
+    try {
+      const nextVariant = aiVariantIndex + 1;
+      const { generateCelebration } = await import('@/lib/services/aiCelebrationApi');
+      const data = await generateCelebration(aiPrompt, nextVariant, aiPreviousMessages);
+      
+      setForm(prev => ({ ...prev, custom_message: data.custom_message }));
+      setAiVariantIndex(nextVariant);
+      setAiPreviousMessages(prev => [...prev, data.custom_message]);
+    } catch (err: any) {
+      setError(err.message || 'Failed to rewrite message.');
+    } finally {
+      setIsRewriting(false);
+    }
+  };
 
   const togglePresetPreview = (trackId: string, trackUrl: string) => {
     if (previewingTrack === trackId) {
@@ -429,8 +490,20 @@ function CreatePageInner() {
         {/* ─── STEP 0: Choose Occasion ─── */}
         {step === 0 && (
           <div className={styles.stepSection}>
-            <h1 className={styles.stepTitle}>What are you celebrating?</h1>
-            <p className={styles.stepDesc}>Choose the occasion for this special surprise.</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div>
+                <h1 className={styles.stepTitle} style={{ marginBottom: '0.5rem' }}>What are you celebrating?</h1>
+                <p className={styles.stepDesc}>Choose the occasion for this special surprise.</p>
+              </div>
+              <button 
+                className="btn btn--primary" 
+                onClick={() => setShowAiModal(true)}
+                style={{ background: 'linear-gradient(135deg, var(--accent), #ff512f)', border: 'none' }}
+              >
+                ✨ Auto-Generate with AI
+              </button>
+            </div>
+            
             <ul className={styles.occasionGrid} role="list">
               {(Object.entries(EVENT_LABELS) as [EventType, { label: string; emoji: string; description: string }][]).map(([key, { label, emoji, description }]) => (
                 <li key={key}>
@@ -456,6 +529,22 @@ function CreatePageInner() {
               ))}
             </ul>
           </div>
+        )}
+
+        {/* AI Modal Integration */}
+        {showAiModal && (
+          <AICreateModal 
+            onClose={() => setShowAiModal(false)}
+            onSuccess={(aiData) => {
+              // Apply the AI generated fields to the form
+              setForm(prev => ({ ...prev, ...aiData }));
+              // Close the modal
+              setShowAiModal(false);
+              // Advance to Step 1 (Personalize) automatically
+              setStep(1);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         )}
 
         {/* ─── STEP 1: Personalise ─── */}
@@ -539,6 +628,25 @@ function CreatePageInner() {
                 <span className="form-hint">
                   {form.custom_message.length}/1000 characters
                 </span>
+                
+                {aiPrompt && (
+                  <button 
+                    type="button" 
+                    className="btn btn--ghost" 
+                    style={{ marginTop: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+                    onClick={handleRewriteMessage}
+                    disabled={isRewriting}
+                  >
+                    {isRewriting ? (
+                      <>
+                        <Loader2 className="spin" size={16} />
+                        Rewriting...
+                      </>
+                    ) : (
+                      <>✨ Rewrite with AI</>
+                    )}
+                  </button>
+                )}
               </div>
 
               <div className="form-group">

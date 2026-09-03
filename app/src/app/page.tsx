@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import styles from './page.module.css';
 import { EVENT_LABELS } from '@/lib/types';
+import { HomeAIChatbox } from '@/components/HomeAIChatbox';
 
 const HOW_IT_WORKS = [
   {
@@ -75,16 +76,11 @@ export default function HomePage() {
             <em className={styles.heroAccent}>Together</em>
           </h1>
           <p className={styles.heroSub}>
-            Create personalised surprise celebrations for birthdays, anniversaries, baby showers and more.
-            Share a secret countdown — your loved one experiences the magic at exactly the right moment.
+            Let our magical AI assistant, <strong>Agent Durgaa</strong>, craft the perfect personalized celebration for you in seconds! 
+            Just tell her what you're celebrating below. (Or you can still craft your own surprise manually using our classic creator!)
           </p>
-          <div className={styles.heroCtas}>
-            <Link href="/create" className="btn btn--primary btn--lg">
-              Create a Surprise ✨
-            </Link>
-            <Link href="/#how-it-works" className="btn btn--ghost btn--lg">
-              See How It Works
-            </Link>
+          <div style={{ marginTop: '2rem', width: '100%' }}>
+            <HomeAIChatbox />
           </div>
 
           {/* Mini stats */}
